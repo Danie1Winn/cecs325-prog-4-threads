@@ -16,6 +16,16 @@
 
 using namespace std;
 
+// Struct to hold array data
+struct Segment {
+    int* start; // Pointer to the first element in the segment
+    int size; // Number of elements in the segment
+};
+
+// Global variable that holds the total swap count
+unsigned long long global_swap_count = 0;
+mutex swap_mutex;
+
 int main(int argc, char* argv[]) {
     // Check for 3 arguments in Prog 4 (program, input, output, segments)
     if (argc != 4) {
@@ -65,8 +75,36 @@ int main(int argc, char* argv[]) {
     inFile.close();
     cout << "Loaded " << N << " numbers into main_array." << endl; // Debugging
 
+    // Dynamic array, holds all segment structs
+    Segment* segments = new Segment[num_segments];
+
+    int base_size = N / num_segments;
+    int remainder = N % num_segments;
+    int* current_ptr = main_array; // Beginning of array
+
+    cout << "Calculating Segemnts" << endl; // Debugging
+
+    // Loop and define segments
+    for (int i = 0; i < num_segments; ++i) {
+        int segment_size = base_size;
+
+        // Distributes remainder by adding it to the last segment
+        if (i == num_segments - 1) {
+            segment_size += remainder;
+        }
+
+        segments[i].start = current_ptr;
+        segments[i].size = segment_size;
+
+        current_ptr += segment_size;
+    }
+
+
+
     // Cleanup
+    delete[] segments;
     delete[] main_array;
     cout << "Sorting complete. Exiting program." << endl;
+    
     return 0;
 }
