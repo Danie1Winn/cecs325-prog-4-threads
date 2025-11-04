@@ -207,7 +207,29 @@ int main(int argc, char* argv[]) {
     }
 
     copy(source, source + N, main_array);
-    
+
+    cout << "Writing sorted data to " << output_file << endl; // Debugging
+
+    // Open file for writing
+    ofstream outFile(output_file);
+    if (!outFile.is_open()) {
+        cerr << "Cannot open output file " << output_file << endl;
+
+        delete[] buffer_a;
+        delete[] buffer_b;
+        delete[] threads;
+        delete[] segments;
+        delete[] main_array;
+        return 1;
+    }
+
+    for (int i = 0; i < N; i++) {
+        outFile << main_array[i] << endl;
+    }
+
+    outFile.close();
+    cout << "Finished writing file." << endl;
+
     // Cleanup
     delete[] buffer_a;
     delete[] buffer_b;
