@@ -87,6 +87,9 @@ int main(int argc, char* argv[]) {
     // Loop and define segments
     for (int i = 0; i < num_segments; ++i) {
         int segment_size = base_size;
+        if (i < remainder) {
+            segment_size ++; // Add to the remainder number of segments
+        }
 
         // Distributes remainder by adding it to the last segment
         if (i == num_segments - 1) {
@@ -105,6 +108,6 @@ int main(int argc, char* argv[]) {
     delete[] segments;
     delete[] main_array;
     cout << "Sorting complete. Exiting program." << endl;
-    
+
     return 0;
 }
