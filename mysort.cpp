@@ -26,6 +26,35 @@ struct Segment {
 unsigned long long global_swap_count = 0;
 mutex swap_mutex;
 
+// Bubble sort function with threading
+void bubble(int* arr_ptr, int size, string name) {
+    unsigned long long local_swaps = 0;
+    bool swapped;
+
+    // Sorting logic with pointer and size
+    for (int i=0; i < size - 1; ++i) {
+        swapped = false;
+        for (int j=0; j < size - i - 1; ++j) {
+            // Compares elements
+            if (arr_ptr[j] > arr_ptr[j+1]) {
+                swap(arr_ptr[j], arr_ptr[j+1]);
+                swapped = true;
+                local_swaps++;
+            }
+        }
+        if (swapped == false) {
+            break;
+        }
+    }
+
+    // Lock mutex
+    swap_mutex.lock();
+    cout << "Thread" << name << " completed w/ " << local_swaps << " swaps." << endl;
+
+    global_swap_count += local_swaps;
+    swap_mutex.unlock();
+}
+
 int main(int argc, char* argv[]) {
     // Check for 3 arguments in Prog 4 (program, input, output, segments)
     if (argc != 4) {
