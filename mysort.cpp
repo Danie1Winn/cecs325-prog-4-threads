@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 
 // New includes for multithreading
 #include <thread>
@@ -53,6 +54,39 @@ void bubble(int* arr_ptr, int size, string name) {
 
     global_swap_count += local_swaps;
     swap_mutex.unlock();
+}
+
+// Merge sorted array segments into destination array
+void merge(int* left, int left_size, int* right, int right_size, int* dest) {
+    int i = 0; // Left
+    int j = 0; // Right
+    int k = 0; // Destination
+    
+    // Compare
+    while (i < left_size && j < right_size) {
+        if (left[i] <= right[j]) {
+            dest[k] = left[i];
+            i++;
+        } else {
+            dest[k] = right[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Remaining left
+    while (i < left_size) {
+        dest[k] = left[i];
+        i++;
+        k++;
+    }
+
+    // Remaining right
+    while (j < right_size) {
+        dest[k] = right[j];
+        j++;
+        k++;
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -149,7 +183,34 @@ int main(int argc, char* argv[]) {
 
     cout << "Totals swaps from threads: " << global_swap_count << endl; // Debugging
 
+    cout << "Starting merge sort" << endl; // Debugging 
+
+    // Temporary bufers
+    int* buffer_a = new int[N];
+    int* buffer_b = new int[N];
+
+    copy(segments[0].start, segments[0].start + segments[0].size, buffer_a);
+
+    int current_merged_size = segments[0].size;
+    int* source = buffer_a; // Read from
+    int* dest = buffer_b; // Write to
+
+    // Loop through segments and  merge
+    for (int i = 1; i < num_segments; ++i) {
+        merge(source, current_merged_size, segments[i].start, segments[i].size, dest);
+        
+        // Update size
+        current_merged_size += segments[i].size;
+
+        // Swap buffers
+        swap(source, dest);
+    }
+
+    copy(source, source + N, main_array);
+    
     // Cleanup
+    delete[] buffer_a;
+    delete[] buffer_b;
     delete[] threads;
     delete[] segments;
     delete[] main_array;
