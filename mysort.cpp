@@ -131,9 +131,26 @@ int main(int argc, char* argv[]) {
         current_ptr += segment_size;
     }
 
+    // Dynamic array
+    thread* threads = new thread[num_segments];
 
+    // Start threads
+    cout << "Launching " << num_segments << " threads." << endl; // Debugging
+    for (int i = 0; i < num_segments; ++i) {
+        string thread_name = "T" + to_string(i);
+
+        threads[i] = thread(bubble, segments[i].start, segments[i].size, thread_name);
+    }
+
+    cout << "Waiting for threads" << endl; // Debugging
+    for (int i = 0; i < num_segments; ++i) {
+        threads[i].join();
+    }
+
+    cout << "Totals swaps from threads: " << global_swap_count << endl; // Debugging
 
     // Cleanup
+    delete[] threads;
     delete[] segments;
     delete[] main_array;
     cout << "Sorting complete. Exiting program." << endl;
